@@ -20,21 +20,25 @@ def check_gradient(f, x, delta=1e-5, tol=1e-4):
 
     fx, analytic_grad = f(x)
     analytic_grad = analytic_grad.copy()
-
+    # print(x.shape)
     assert analytic_grad.shape == x.shape
 
+    orig_x = x
     it = np.nditer(x, flags=['multi_index'], op_flags=['readwrite'])
     while not it.finished:
         ix = it.multi_index
+        H = np.zeros(orig_x.shape)
+        H[ix] = delta
         analytic_grad_at_ix = analytic_grad[ix]
-        numeric_grad_at_ix = 0
-
-        # TODO Copy from previous assignment
-        raise Exception("Not implemented!")
+        loss_plus, gp = f(orig_x + H)
+        loss_minus, gm = f(orig_x - H)
+        numeric_grad_at_ix = (loss_plus - loss_minus) / delta / 2
+        print(loss_plus, loss_minus)
+        # raise Exception("Not implemented!")
 
         if not np.isclose(numeric_grad_at_ix, analytic_grad_at_ix, tol):
             print("Gradients are different at %s. Analytic: %2.5f, Numeric: %2.5f" % (
-                  ix, analytic_grad_at_ix, numeric_grad_at_ix))
+                ix, analytic_grad_at_ix, numeric_grad_at_ix))
             return False
 
         it.iternext()
@@ -56,6 +60,7 @@ def check_layer_gradient(layer, x, delta=1e-5, tol=1e-4):
     Returns:
       bool indicating whether gradients match or not
     """
+    print(x)
     output = layer.forward(x)
     output_weight = np.random.randn(*output.shape)
 
@@ -96,6 +101,7 @@ def check_layer_param_gradient(layer, x,
         output = layer.forward(x)
         loss = np.sum(output * output_weight)
         d_out = np.ones_like(output) * output_weight
+        # print("d_out", d_out)
         layer.backward(d_out)
         grad = param.grad
         return loss, grad

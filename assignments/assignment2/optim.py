@@ -26,6 +26,7 @@ class MomentumSGD:
     """
     def __init__(self, momentum=0.9):
         self.momentum = 0.9
+        self.v = 0
     
     def update(self, w, d_w, learning_rate):
         """
@@ -40,6 +41,8 @@ class MomentumSGD:
         updated_weights, np array same shape as w
         """
         # TODO Implement momentum update
+        self.v = self.momentum * self.v -  d_w * learning_rate
         # Hint: you'll need to introduce some variables to remember
         # velocity from the previous updates
-        raise Exception("Not implemented!")        
+        return w + self.v
+        #raise Exception("Not implemented!")

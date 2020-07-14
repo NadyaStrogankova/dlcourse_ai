@@ -1,7 +1,7 @@
 import os
 
 import numpy as np
-import scipy.io as io
+import scipy.io as  io
 
 
 def load_data_mat(filename, max_samples, seed=42):
